@@ -1,0 +1,17 @@
+engine_name : "yaneuraou_7_qpd"
+engine_mode : "forcebook" 
+engine_config:
+  alert_bad_move : False
+  kif_file_black : "/home/shiku/AI/shogi/dataset/swd-train/gangi/black/*.kif"
+  kif_file_white : "/home/shiku/AI/shogi/dataset/swd-train/gangi/white/*.kif"
+  max_level : True
+  forcebook_ply_max: 6
+  bonus_amp : 1000
+
+base_engine_config:
+  engine_mode : "yaneuraou"
+  engine_path : "YaneuraOu-by-gcc.exe"
+  engine_name : "yaneuraou_7_qpd"
+
+  option : [["Threads", "4"], ["BookFile", "no_book.db"], ["MultiPV", "1"], ["EvalDir", "eval"]]
+

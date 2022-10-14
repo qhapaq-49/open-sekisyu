@@ -1,0 +1,1 @@
+nuitka3-run.exe --mingw64 --onefile --windows-product-name forcebook --windows-product-version 0.0.9 --windows-company-name qhapaq_research_lab win_usi_engine_main.py

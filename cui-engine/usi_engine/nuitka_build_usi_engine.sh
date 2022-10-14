@@ -1,0 +1,2 @@
+# python -m nuitka --onefile --standalone --nofollow-import-to=matplotlib --nofollow-import-to=pandas --nofollow-import-to=numpy usi_engine_main.py 
+python -m nuitka --onefile --standalone --nofollow-import-to=matplotlib --nofollow-import-to=pandas --nofollow-import-to=numpy win_usi_engine_main.py 

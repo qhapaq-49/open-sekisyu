@@ -1,0 +1,9 @@
+local
+*.pyc
+*.csa
+*.csv
+*.json
+.vscode
+*.db
+*.exe
+*.bin

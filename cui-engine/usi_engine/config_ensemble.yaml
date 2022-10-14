@@ -1,0 +1,17 @@
+engine_name : "yaneuraou_7_qpd"
+engine_mode : "ensemble" 
+
+ensembler_config:
+  ensembler_mode : "positive"
+base_engine_configs:
+  -
+    engine_mode : "yaneuraou"
+    engine_path : "ssh sophon /home/shiku/AI/shogi/bin/YaneuraOu-7"
+    engine_name : "yaneuraou_7_qpd"
+    option : [["Threads", "2"], ["BookFile", "no_book.db"], ["MultiPV", "1"], ["EvalDir", "/home/shiku/AI/shogi/bin/suisho5_eval"]]
+  -
+    engine_mode : "yaneuraou"
+    engine_path : "/home/shiku/AI/shogi/bin/YaneuraOu-7"
+    engine_name : "yaneuraou_7_qpd"
+    option : [["Threads", "2"], ["BookFile", "no_book.db"], ["MultiPV", "1"], ["EvalDir", "/home/shiku/AI/shogi/bin/suisho5_eval"]]
+
