@@ -6,15 +6,16 @@ from typing import Any, Dict, List, Tuple
 import shogi
 from dacite import from_dict
 from sekisyu.engine.base_engine import BaseEngine, UsiEngineState
-from sekisyu.ensemble.base_ensembler import BaseEnsembler
 from sekisyu.engine.virtual_engine.base_virtual_engine import BaseVirtualEngine
+from sekisyu.ensemble.base_ensembler import BaseEnsembler
 from sekisyu.playout.playinfo import BasePlayInfoPack
 from shogi import CSA, KIF, SQUARES, Consts
-from sekisyu.ensemble.base_ensembler import BaseEnsembler
+
 
 class EnsembleEngine(BaseVirtualEngine):
-    
-    def __init__(self, engines: List[BaseEngine], ensembler: BaseEnsembler, engine_name: str) -> None:
+    def __init__(
+        self, engines: List[BaseEngine], ensembler: BaseEnsembler, engine_name: str
+    ) -> None:
         """
         エンジンの初期化
 
@@ -72,14 +73,14 @@ class EnsembleEngine(BaseVirtualEngine):
         self.print_info = print_info
         for engine in self.engines:
             engine.set_print_info(print_info)
-            
+
     def get_state(self):
         """
         現在のエンジンの状況を出力する
         """
         # timekeeperであるengine[0]を利用する
         return self.engines[0].get_state()
-    
+
     def get_usi_option(self) -> List[str]:
         """
         usiコマンドで出力するべきオプションを列挙する
@@ -100,7 +101,7 @@ class EnsembleEngine(BaseVirtualEngine):
             if not engine.is_connected():
                 return False
         return True
-        
+
     def set_option(self, options: List[List[Tuple[str, str]]]) -> None:
         """
         エンジンにオプションを送る
@@ -123,7 +124,7 @@ class EnsembleEngine(BaseVirtualEngine):
         for engine in self.engines:
             output.append(engine.get_option())
         return output
-    
+
     def send_go_and_wait(self, go_cmd: str) -> BasePlayInfoPack:
         """
         エンジンにgo コマンドを送り、bestmoveが帰ってくるまで待つ
@@ -143,13 +144,16 @@ class EnsembleEngine(BaseVirtualEngine):
         pvの後処理を行う。主にvirtual engineでmultipvの結果を処理して云々みたいな使い方をする
         デフォルトでは何もしない
         """
-        
+
         # step 1 まずslaveのエンジンを全て止める
         for engine in self.engines[1:]:
             engine.send_command("stop")
             engine.wait_for_state(UsiEngineState.WaitCommand)
-        
-        infos = [engine.parse_pv(engine.get_current_think_result()) for engine in self.engines]
+
+        infos = [
+            engine.parse_pv(engine.get_current_think_result())
+            for engine in self.engines
+        ]
         out = self.ensembler.ensemble(infos, self.position)
         out.bestmove = out.infos[0].pv[0]
         if len(out.infos[0].pv) > 1:
@@ -167,7 +171,7 @@ class EnsembleEngine(BaseVirtualEngine):
         if cmd == "gameover" or cmd == "usinewgame":
             self.reflesh_game()
         elif cmd.startswith("position"):
-            self.position = cmd    
+            self.position = cmd
             send_all = True
         elif cmd.startswith("setoption"):
             # TODO : optionはどのengine向けかを解析して送る

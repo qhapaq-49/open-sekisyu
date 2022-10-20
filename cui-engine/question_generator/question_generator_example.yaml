@@ -1,0 +1,27 @@
+
+ques_config:
+  engine_config:
+    engine_path : "/home/shiku/AI/shogi/gui-sekisyu/engine_to_analyze/YaneuraOu-by-gcc"
+    engine_name : "yaneuraou_6.02_molqha"
+    engine_mode : "yaneuraou" 
+    option : [["Threads", "4"], ["BookFile", "no_book"], ["MultiPV", "10"]]
+  go_cmd : "go nodes 100000"
+  # この棋譜から生成する                                                                                           
+  kifs : ["kif/20211024_073657 Human vs YaneuraOu NNUE 6.02 64AVX2 TOURNAMENT.kif"]
+
+  # 棋譜ファイルにごとにこの回数探索を繰り返す                                                                     
+  loop_per_kif : 1
+  hero : "black"
+
+  # 棋譜のこの手数から生成する                                                                                     
+  move_min_kif : 4
+  move_max_kif : 40
+
+  # generate用のoption                                                                                             
+  move_max_ques : 2
+
+  # 出力先                                                                                                         
+  output_dir : "ques_output"
+
+  config_render:
+    print_selection: True

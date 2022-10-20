@@ -1,0 +1,26 @@
+engine_mode : "sekisyu"
+engine_name : "sekisyu-engine"
+engine_config:
+  qsa_path : "/home/shiku/AI/shogi/qsa/dist/linux-unpacked/qhapaq-shogi-academy"
+  analyze_go_null_enemy_cmd : "go_nodes_1000000"
+  null_enemy_rank : 2
+
+base_engine_config:
+  engine_mode : "yaneuraou"
+  engine_path : "/home/shiku/AI/shogi/bin/YaneuraOu-7"
+  engine_name : "yaneuraou_7_qpd"
+  alert_bad_move : False
+  kif_file_black : "/home/shiku/AI/shogi/dataset/swd-train/gangi/black/*.kif"
+  kif_file_white : "/home/shiku/AI/shogi/dataset/swd-train/gangi/white/*.kif"
+  # kif_file_black : "/home/shiku/AI/shogi/dataset/kif/1124_release/先手ツノ銀雁木/2021-10-21-08-46*.csa"
+  # kif_file_white : "/home/shiku/AI/shogi/dataset/kif/1124_release/後手ツノ銀雁木/2021-10-21-10-47*.csa"
+  max_level : True
+  forcebook_ply_max: 6
+  bonus_amp : 1000
+  option : [["Threads", "4"], ["BookFile", "no_book.db"], ["MultiPV", "1"], ["EvalDir", "/home/shiku/AI/shogi/bin/QPD"]]
+analyze_engine_config:
+  engine_mode : "yaneuraou"
+  engine_path : "/home/shiku/AI/shogi/bin/YaneuraOu-7"
+  engine_name : "yaneuraou_7_qpd"
+  option : [["Threads", "4"], ["BookFile", "no_book"], ["MultiPV", "10"], ["EvalDir", "/home/shiku/AI/shogi/bin/QPD"]]
+

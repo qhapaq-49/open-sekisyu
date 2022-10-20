@@ -1,5 +1,7 @@
-from sekisyu.engine.base_engine import BaseEngine, Turn, UsiEngineState
 import time
+
+from sekisyu.engine.base_engine import BaseEngine, Turn, UsiEngineState
+
 
 class DlshogiEngine(BaseEngine):
     """
@@ -7,12 +9,12 @@ class DlshogiEngine(BaseEngine):
 
     USIプロトコルを介し、対局や各種局面の解析を行う。
     特定のエンジンにしか無い機能はここに適宜書いていく
-    
+
     1. dlshogiではmultipvのnodesを各手別の訪問数に書き換えるための処置を入れる
     2. dlshogiはusiプロトコルのponderに頼らない作りになっているがアンサンブルなどを取るときに
     インターフェイスが統一されてないと不便なのでメッセージを無視する形で対応する
     """
-    
+
     def __init__(self, engine_name: str = "") -> None:
         super().__init__(engine_name)
         self.ponder_str = None
@@ -33,7 +35,7 @@ class DlshogiEngine(BaseEngine):
         self.send_command("isready")  # 先行して"isready"を送信
         self.change_state(UsiEngineState.WaitReadyOk)
         self.ponder_str = None
-        
+
         try:
             while True:
                 message = self.send_queue.get()
@@ -56,7 +58,9 @@ class DlshogiEngine(BaseEngine):
                         self.print_info_before = self.print_info
                     self.set_print_info(self.print_info_before)
                     if messages[1] == "ponder":
-                        print("info string dlshogi engine does not depends on shameful usi ponder protocol")
+                        print(
+                            "info string dlshogi engine does not depends on shameful usi ponder protocol"
+                        )
                         self.ponder_str = message.replace("ponder", "")
                         self.change_state(UsiEngineState.WaitBestmove)
                         continue
@@ -143,7 +147,7 @@ class DlshogiEngine(BaseEngine):
             for idx in range(len(self.think_result.infos)):
                 if self.think_result.infos[idx].pv[0] == mpv_ply:
                     self.think_result.infos[idx].nodes = mpv_nodes
-                    
+
         elif self.engine_state == UsiEngineState.PrintUSI:
             if token == "usiok":
                 self.change_state(UsiEngineState.WaitCommand)

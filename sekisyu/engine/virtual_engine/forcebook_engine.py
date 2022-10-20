@@ -73,13 +73,17 @@ class BoardSimularityCalculator:
         TODO : ゲームの進行に応じて最も類似度が高い棋譜を選ぶとかしたい
         """
         if len(glob.glob(self.black_file_glob)) != 0:
-            print(f"info string load kif file from {len(glob.glob(self.black_file_glob))} files")
+            print(
+                f"info string load kif file from {len(glob.glob(self.black_file_glob))} files"
+            )
             self.game_to_use_black = random.choice(glob.glob(self.black_file_glob))
         else:
             print(f"info string kif file not found. possibly wrong path")
             self.game_to_use_black = None
         if len(glob.glob(self.white_file_glob)) != 0:
-            print(f"info string load kif file from {len(glob.glob(self.white_file_glob))} files")
+            print(
+                f"info string load kif file from {len(glob.glob(self.white_file_glob))} files"
+            )
             self.game_to_use_white = random.choice(glob.glob(self.white_file_glob))
         else:
             print(f"info string kif file not found. possibly wrong path")

@@ -7,11 +7,11 @@ from typing import Any, Dict, List, Optional, Tuple
 import shogi
 from dacite import Config, from_dict
 from sekisyu.battle.config_battle import ConfigBattle
+from sekisyu.board.mycsa import Parser
 from sekisyu.kif_analyzer.config_kif_analyzer import ConfigAnalysis
 from sekisyu.kif_labeler.game_info_getter import get_title_alias_year_csa
-from sekisyu.playout.playinfo import BasePlayInfoPack, BasePlayInfo
+from sekisyu.playout.playinfo import BasePlayInfo, BasePlayInfoPack
 from shogi import CSA, KIF
-from sekisyu.board.mycsa import Parser
 
 
 # ゲームの終局状態を示す
@@ -238,13 +238,15 @@ class BasePlayOut:
             for pv, value in zip(pvs, values):
                 pv_to_use = [csa_dat["moves"][idx]]
                 pv_to_use.extend(pv)
-                playinfo = BasePlayInfo(pv=pv_to_use, eval=value if idx % 2 == 0 else -value)
+                playinfo = BasePlayInfo(
+                    pv=pv_to_use, eval=value if idx % 2 == 0 else -value
+                )
                 infos.append(playinfo)
-                break # csa does not support multipv
+                break  # csa does not support multipv
             info_pack = BasePlayInfoPack(infos=infos)
             idx += 1
             info_pack_list.append(info_pack)
-            
+
         alias, timestamp, title = get_title_alias_year_csa(file_name)
         if csa_dat["win"] == "b":
             result = GameResult.BLACK_WIN

@@ -76,14 +76,13 @@ class BasePlayInfo:
         playinfoは解析結果を機械的に読み出しているだけであることに注意
         """
         return UsiEvalValue(self.eval).is_mated_score()
-    
+
     def get_usi_str(self) -> str:
         """
         usiプロトコルに従ってログを吐く
         """
         output = f"info nps {self.nps} nodes {self.nodes} score cp {self.eval} depth {self.depth} pv {' '.join(self.pv)}"
         return output
-        
 
     def copy(self):
         out = BasePlayInfo()
@@ -148,13 +147,13 @@ class BasePlayInfoPack:
     def __deepcopy__(self):
         return self.copy()
 
-    def generate_ponder_from_pv(self)->None:
+    def generate_ponder_from_pv(self) -> None:
         """
         エンジンがponderを返さなかった場合などに、infoからponderを生成する
         """
         for info in self.infos:
             if info.pv[0] == self.bestmove and len(info.pv) > 1:
-                self.ponder = info.pv[1]                
+                self.ponder = info.pv[1]
 
     def copy(self):
         out = BasePlayInfoPack()
@@ -212,7 +211,7 @@ def generate_playinfo_from_info(message: str) -> Union[BasePlayInfo, None]:
                     try:
                         ply = int(scanner.get_integer())  # pylintが警告を出すのでintと明示しておく。
                     except Exception:
-                        ply = 3 # if no ply info is given assume this is checkmate+1
+                        ply = 3  # if no ply info is given assume this is checkmate+1
                     if not is_minus:
                         pv.eval = UsiEvalValue.mate_in_ply(ply)
                     else:

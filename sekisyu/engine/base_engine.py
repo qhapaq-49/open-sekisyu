@@ -150,7 +150,7 @@ class BaseEngine:
                 self.change_state(UsiEngineState.Disconnected)
                 self.exit_state = "Connection Error"
                 raise FileNotFoundError(self.engine_fullpath + " not found.")
-            
+
             self.proc = subprocess.Popen(
                 self.engine_fullpath,
                 shell=True,
@@ -170,7 +170,7 @@ class BaseEngine:
                 stderr=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 encoding="shift-jis",
-            )        
+            )
         # self.send_command("usi")
         self.change_state(UsiEngineState.Connected)
 
@@ -256,7 +256,9 @@ class BaseEngine:
         """
         return self.think_result
 
-    def parse_pv(self, think_result: BasePlayInfoPack, is_ponder:bool=False) -> BasePlayInfoPack:
+    def parse_pv(
+        self, think_result: BasePlayInfoPack, is_ponder: bool = False
+    ) -> BasePlayInfoPack:
         """
         pvの後処理を行う。主にvirtual engineでmultipvの結果を処理して云々みたいな使い方をする
         デフォルトのbase_engineでは何もしない
@@ -486,7 +488,5 @@ class BaseEngine:
             self.send_cmd(command)
 
             # エンジン側から一行受信するまでblockingして待機
-            self.state_changed_cv.wait_for(
-                lambda: self.last_received_line is not None
-            )
+            self.state_changed_cv.wait_for(lambda: self.last_received_line is not None)
             return self.last_received_line

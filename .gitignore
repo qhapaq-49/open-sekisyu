@@ -7,3 +7,6 @@ local
 *.db
 *.exe
 *.bin
+cui-engine/*/*.build
+cui-engine/*/*.dist
+cui-engine/*/*.onefile-build
