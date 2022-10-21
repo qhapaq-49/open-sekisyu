@@ -25,7 +25,11 @@ PIECE_STR_JA = [
 def get_ja_move(board: shogi.Board, move_usi, prev_move_usi: str = None):
     out = ""
     is_drop = False
-    move = shogi.Move.from_usi(move_usi)
+    try:
+        move = shogi.Move.from_usi(move_usi)
+    except Exception:
+        print(f"info string unknown movetype possibly because of update of usi protocol :( {move_usi}")
+        return None
     if move.from_square is None:
         is_drop = True
         out += str(9 - move.to_square % 9) + str(1 + move.to_square // 9)
@@ -66,12 +70,17 @@ def translate_pv(current_pos: str, moves: List[str], prev_move: str = None) -> s
     # board from current pos
     out = ""
     prev = prev_move
-    for move in moves:
-        out += get_ja_move(board, move, prev) + "、"
+    move_num = 0
+    for i, move in enumerate(moves):
+        jmove = get_ja_move(board, move, prev)
+        if jmove is None:
+            break
+        out +=  jmove + "、"
         board.push_usi(move)
         prev = move
+        move_num += 1
 
-    for _ in moves:
+    for _ in range(move_num):
         board.pop()
 
     return out[:-1]
