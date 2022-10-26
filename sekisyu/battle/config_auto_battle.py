@@ -2,7 +2,6 @@ import dataclasses
 from typing import Any, Dict
 
 from sekisyu.battle.config_battle import ConfigBattle
-from sekisyu.engine.engine_generator import ConfigEngine
 
 
 @dataclasses.dataclass
