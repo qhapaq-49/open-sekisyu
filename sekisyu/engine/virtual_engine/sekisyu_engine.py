@@ -1,13 +1,10 @@
 import dataclasses
-import glob
 import json
 import os
-import random
 import subprocess
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-import shogi
 from dacite import from_dict
 from pytz import timezone
 from sekisyu.board.get_board_from_pos_cmd import get_board_from_pos_cmd
@@ -16,7 +13,6 @@ from sekisyu.engine.config_engine import ConfigEngine
 from sekisyu.engine.virtual_engine.base_virtual_engine import BaseVirtualEngine
 from sekisyu.playout.playinfo import BasePlayInfoPack
 from sekisyu.qgen.question_generator import generate_question_from_pos
-from shogi import CSA, KIF, SQUARES, Consts
 
 stdin_mode = False
 

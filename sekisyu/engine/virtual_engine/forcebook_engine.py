@@ -1,7 +1,6 @@
 import dataclasses
 import glob
 import random
-from tkinter import Y
 from typing import Any, Dict, List, Tuple
 
 import shogi
@@ -351,10 +350,12 @@ class ConfigForceEngine:
     # 定跡が当たった場合はそのまま指す
     use_book: bool = True
 
-    # 接待用レーティング。deprecated。nodesを減らすほうが良い
-    level: int = 1500
+    # 棋力調整用のレーティング。時々意図的に悪い手を指させるためにnodesをランダムに変える
+    node_max: int = 20000
+    # 探索node数は node_maxからnode_max x 2^{-node_range} まで対数分布で推移する
+    node_range: int = 5
     # 本気を出すか否かのスイッチ
-    max_level: bool = False
+    max_level: bool = True
 
     # 手の良し悪しを判別して悪手をアラームするか
     alert_bad_move: bool = False
@@ -443,9 +444,12 @@ class ForceBookEngine(BaseVirtualEngine):
 
         # 手加減具合
         # 現状やねうら王側に任せる。nodesを絞った探索が一番それっぽい手加減ができてるように見えるから
-        # opt_list.append("option name Level type spin default 1500 min 100 max 5000")
+        opt_list.append(
+            "option name LevelMax type spin default 2022 min 100 max 20000000"
+        )
+        opt_list.append("option name LevelRange type spin default 5 min 1 max 10")
         # 手加減なしモード
-        # opt_list.append("option name MaxLevel type check default false")
+        opt_list.append("option name MaxLevel type check default true")
         return opt_list
 
     def set_option(self, options: List[Tuple[str, str]]) -> None:
@@ -460,8 +464,12 @@ class ForceBookEngine(BaseVirtualEngine):
         for opt in options:
             # if opt[0] == "Level":
             #     self.config.level = int(opt[1])
-            # elif opt[0] == "MaxLevel":
-            #     self.config.max_level = opt[1]
+            if opt[0] == "MaxLevel":
+                self.config.max_level = opt[1]
+            elif opt[0] == "NodeMax":
+                self.config.node_max = int(opt[1])
+            elif opt[0] == "NodeRange":
+                self.config.node_range = int(opt[1])
             if opt[0] == "KifBlack":
                 self.config.kif_file_black = opt[1]
                 self.bn = BoardSimularityCalculator(
@@ -500,9 +508,6 @@ class ForceBookEngine(BaseVirtualEngine):
         """
         エンジンに特別なコマンドを送る。
         """
-        # todo レーティングや棋風エンジンの調整をここで行えるようにする
-        if cmd.startswith("setoption name Level"):
-            pass
         if cmd.startswith("go"):
             self.before_go_cmd(cmd)
         elif cmd.startswith("setoption"):
@@ -654,7 +659,11 @@ class ForceBookEngine(BaseVirtualEngine):
         self.switch_pv()
         if not self.config.max_level:
             # TODO : レーティングとノード数の式を決める
-            nodes = self.config.level
+            rate_level = random.randint(0, self.config.node_range)
+            nodes = self.config.node_max
+            for _ in range(rate_level):
+                nodes = int(nodes / 2)
+            print(f"info string node changed to {nodes}")
             return f"go nodes {nodes}"
         return go_cmd
 
