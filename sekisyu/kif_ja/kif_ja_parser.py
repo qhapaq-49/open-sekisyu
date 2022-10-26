@@ -28,7 +28,9 @@ def get_ja_move(board: shogi.Board, move_usi, prev_move_usi: str = None):
     try:
         move = shogi.Move.from_usi(move_usi)
     except Exception:
-        print(f"info string unknown movetype possibly because of update of usi protocol :( {move_usi}")
+        print(
+            f"info string {move_usi} is unknown movetype possibly because of update of usi protocol"
+        )
         return None
     if move.from_square is None:
         is_drop = True
@@ -75,7 +77,7 @@ def translate_pv(current_pos: str, moves: List[str], prev_move: str = None) -> s
         jmove = get_ja_move(board, move, prev)
         if jmove is None:
             break
-        out +=  jmove + "、"
+        out += jmove + "、"
         board.push_usi(move)
         prev = move
         move_num += 1
