@@ -10,6 +10,7 @@
 - [将棋エンジン拡張 (Extension of Shogi AIs)](cui-engine/usi_engine)
   - 特定の棋風を指しこなすエンジン (Fine-tuning of playstyle using playout)
   - 合議エンジン (Ensemble using multiple engines)
+- cuiベースの対局ツール
 - 測定・解析用ツール (Toolkits for benchmark and analysis)
   - リリース準備中 (TBE)
 
@@ -17,6 +18,11 @@
 - open-sekisyuはpythonで開発されていますが、nuitkaでコンパイルしたWindows/Linux対応のバイナリを生成・配布しています。詳しくはcui-engineフォルダ内を参照してください。
 
 # 開発者向け情報 (Information to developers)
+
+## For contributors
+- We use [pysen](https://github.com/pfnet/pysen) to check format
+
+## 将棋AI開発者向けの情報
 - 本ライブラリをコンピュータ将棋の大会や各種サービスで使う際は使った旨を必ず明記してください。
   - 利用状況を調査する目的であり利用料を取ろうというわけではありません
 - 本ライブラリは[python-shogi](https://github.com/gunyarakun/python-shogi)をimportしています。GPL汚染に気をつけてください。
