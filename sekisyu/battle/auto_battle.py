@@ -78,8 +78,8 @@ def kif_make(conf: ConfigAutoBattle, reboot_engine: bool = False) -> AutoBattleR
                 )
         if reboot_engine:
             server.terminate()
-            engine1 = generate_engine(conf.config_1p)
-            engine2 = generate_engine(conf.config_2p)
+            engine1 = generate_engine_dict(conf.config_1p)
+            engine2 = generate_engine_dict(conf.config_2p)
             server: BattleServer = BattleServer(engine1, engine2, conf.config)
 
     server.terminate()

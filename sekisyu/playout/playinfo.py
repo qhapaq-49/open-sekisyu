@@ -4,7 +4,7 @@ from dataclasses import field
 from typing import Dict, List, Union
 
 from sekisyu.playout.log_scanner import Scanner
-from sekisyu.playout.usi_value import UsiBound, UsiEvalValue
+from sekisyu.playout.usi_value import UsiEvalValue
 
 
 @dataclasses.dataclass
@@ -60,7 +60,7 @@ class BasePlayInfo:
     multipv: int = 1
     eval: UsiEvalValue = UsiEvalValue(0)
 
-    def __deepcopy__(self):
+    def __deepcopy__(self) -> "BasePlayInfo":
         return self.copy()
 
     def is_mate(self) -> bool:
@@ -84,7 +84,7 @@ class BasePlayInfo:
         output = f"info nps {self.nps} nodes {self.nodes} score cp {self.eval} depth {self.depth} pv {' '.join(self.pv)}"
         return output
 
-    def copy(self):
+    def copy(self) -> "BasePlayInfo":
         out = BasePlayInfo()
         out.pv = copy.deepcopy(self.pv)
         out.nps = self.nps
@@ -144,7 +144,7 @@ class BasePlayInfoPack:
     bestmove: str = ""
     ponder: str = ""
 
-    def __deepcopy__(self):
+    def __deepcopy__(self) -> "BasePlayInfoPack":
         return self.copy()
 
     def generate_ponder_from_pv(self) -> None:
@@ -155,7 +155,7 @@ class BasePlayInfoPack:
             if info.pv[0] == self.bestmove and len(info.pv) > 1:
                 self.ponder = info.pv[1]
 
-    def copy(self):
+    def copy(self) -> "BasePlayInfoPack":
         out = BasePlayInfoPack()
         out.infos = [info.copy() for info in self.infos]
         out.elapsed = self.elapsed
@@ -188,51 +188,77 @@ def generate_playinfo_from_info(message: str) -> Union[BasePlayInfo, None]:
             if token == "string":
                 return None
             elif token == "depth":
-                pv.depth = scanner.get_integer()
+                v = scanner.get_integer()
+                if v is not None:
+                    pv.depth = v
             elif token == "seldepth":
-                pv.seldepth = scanner.get_integer()
+                v = scanner.get_integer()
+                if v is not None:
+                    pv.seldepth = v
             elif token == "nodes":
-                pv.nodes = scanner.get_integer()
+                v = scanner.get_integer()
+                if v is not None:
+                    pv.nodes = v
             elif token == "nps":
-                pv.nps = scanner.get_integer()
+                v = scanner.get_integer()
+                if v is not None:
+                    pv.nps = v
             elif token == "hashfull":
-                pv.hashfull = scanner.get_integer()
+                v = scanner.get_integer()
+                if v is not None:
+                    pv.hashfull = v
             elif token == "time":
-                pv.time = scanner.get_token()
+                v_str = scanner.get_token()
+                if v_str is not None:
+                    pv.time = int(v_str)
             elif token == "pv":
                 pv.pv = scanner.rest_string_list()
             elif token == "multipv":
-                pv.multipv = scanner.get_integer()
+                v = scanner.get_integer()
+                if v is not None:
+                    pv.multipv = v
             # 評価値絡み
             elif token == "score":
                 token = scanner.get_token()
                 if token == "mate":
-                    is_minus = scanner.peek_token()[0] == "-"
-                    try:
-                        ply = int(scanner.get_integer())  # pylintが警告を出すのでintと明示しておく。
-                    except Exception:
-                        ply = 3  # if no ply info is given assume this is checkmate+1
-                    if not is_minus:
-                        pv.eval = UsiEvalValue.mate_in_ply(ply)
-                    else:
-                        pv.eval = UsiEvalValue.mated_in_ply(-ply)
+                    bw_token = scanner.peek_token()
+                    if bw_token is not None:
+                        is_minus = bw_token[0] == "-"
+                        try:
+                            v = scanner.get_integer()
+                            ply = int(
+                                v if v is not None else 3
+                            )  # pylintが警告を出すのでintと明示しておく。
+                        except Exception:
+                            ply = (
+                                3  # if no ply info is given assume this is checkmate+1
+                            )
+                        if not is_minus:
+                            pv.eval = UsiEvalValue.mate_in_ply(ply)
+                        else:
+                            pv.eval = UsiEvalValue.mated_in_ply(-ply)
                 elif token == "cp":
-                    pv.eval = UsiEvalValue(scanner.get_integer())
+                    v = scanner.get_integer()
+                    if v is not None:
+                        pv.eval = UsiEvalValue(v)
 
                 # この直後に"upperbound"/"lowerbound"が付与されている可能性がある。
                 token = scanner.peek_token()
                 if token == "upperbound":
-                    pv.bound = UsiBound.BoundUpper
+                    pv.is_upperbound = True
+                    pv.is_lowerbound = False
                     scanner.get_token()
                 elif token == "lowerbound":
-                    pv.bound = UsiBound.BoundLower
+                    pv.is_lowerbound = True
+                    pv.is_upperbound = False
                     scanner.get_token()
                 else:
-                    pv.bound = UsiBound.BoundExact
+                    pv.is_lowerbound = False
+                    pv.is_upperbound = False
 
             # "info string.."はコメントなのでこの行は丸ごと無視する。
             else:
-                raise ValueError("ParseError" + token)
+                raise ValueError(f"ParseError {token}")
         except Exception:
             raise ValueError
     # pv check

@@ -1,15 +1,9 @@
-import dataclasses
-import glob
-import random
-from typing import Any, Dict, List, Tuple
+from typing import List, Optional, Tuple
 
-import shogi
-from dacite import from_dict
 from sekisyu.engine.base_engine import BaseEngine, UsiEngineState
 from sekisyu.engine.virtual_engine.base_virtual_engine import BaseVirtualEngine
 from sekisyu.ensemble.base_ensembler import BaseEnsembler
 from sekisyu.playout.playinfo import BasePlayInfoPack
-from shogi import CSA, KIF, SQUARES, Consts
 
 
 class EnsembleEngine(BaseVirtualEngine):
@@ -38,7 +32,7 @@ class EnsembleEngine(BaseVirtualEngine):
             return "ensemble_engine"
         return self.engine_name
 
-    def boot(self, engine_path: List[str]) -> None:
+    def boot_ensemble(self, engine_path: List[str]) -> None:
         """
         エンジンを起動する
 
@@ -47,6 +41,9 @@ class EnsembleEngine(BaseVirtualEngine):
         """
         for engine, path in zip(self.engines, engine_path):
             engine.boot(path)
+
+    def boot(self, engine_path: str) -> None:
+        raise NotImplementedError
 
     def send_isready_and_wait(self) -> None:
         """
@@ -74,7 +71,7 @@ class EnsembleEngine(BaseVirtualEngine):
         for engine in self.engines:
             engine.set_print_info(print_info)
 
-    def get_state(self):
+    def get_state(self) -> Optional[UsiEngineState]:
         """
         現在のエンジンの状況を出力する
         """
@@ -102,7 +99,17 @@ class EnsembleEngine(BaseVirtualEngine):
                 return False
         return True
 
-    def set_option(self, options: List[List[Tuple[str, str]]]) -> None:
+    def set_option(self, options: List[Tuple[str, str]]) -> None:
+        """
+        エンジンにオプションを送る
+
+        options list((str, str)):
+            USIプロトコルによってオプションを設定する
+            setoption name options[i][0] value options[i][1]
+        """
+        raise NotImplementedError
+
+    def set_option_ensemble(self, options: List[List[Tuple[str, str]]]) -> None:
         """
         エンジンにオプションを送る
 
@@ -113,7 +120,7 @@ class EnsembleEngine(BaseVirtualEngine):
         for opt, engine in zip(options, self.engines):
             engine.set_option(opt)
 
-    def get_option(self) -> List[List[Tuple[str, str]]]:
+    def get_option_ensemble(self) -> List[List[Tuple[str, str]]]:
         """
         エンジンに送ったオプションを返す
 
@@ -124,6 +131,15 @@ class EnsembleEngine(BaseVirtualEngine):
         for engine in self.engines:
             output.append(engine.get_option())
         return output
+
+    def get_option(self) -> List[Tuple[str, str]]:
+        """
+        エンジンのオプションを返す
+
+        Returns:
+            list((str, str)) : オプション一覧
+        """
+        raise NotImplementedError
 
     def send_go_and_wait(self, go_cmd: str) -> BasePlayInfoPack:
         """
@@ -139,12 +155,14 @@ class EnsembleEngine(BaseVirtualEngine):
         result = self.engines[0].send_go_and_wait(go_cmd)
         return self.parse_pv(result)
 
-    def parse_pv(self, think_result: BasePlayInfoPack) -> BasePlayInfoPack:
+    def parse_pv(
+        self, think_result: BasePlayInfoPack, is_ponder: bool = False
+    ) -> BasePlayInfoPack:
         """
         pvの後処理を行う。主にvirtual engineでmultipvの結果を処理して云々みたいな使い方をする
         デフォルトでは何もしない
         """
-
+        print("info string parse pv start")
         # step 1 まずslaveのエンジンを全て止める
         for engine in self.engines[1:]:
             engine.send_command("stop")
@@ -197,7 +215,7 @@ class EnsembleEngine(BaseVirtualEngine):
         for engine in self.engines:
             engine.reflesh_game()
 
-    def wait_for_state(self, state: UsiEngineState):
+    def wait_for_state(self, state: UsiEngineState) -> None:
         self.engines[0].wait_for_state(state)
 
     def get_current_think_result(self) -> BasePlayInfoPack:

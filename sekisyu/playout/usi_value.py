@@ -28,21 +28,21 @@ class UsiEvalSpecialValue(IntEnum):
 class UsiEvalValue(int):
 
     # 詰みのスコアであるか
-    def is_mate_score(self):
+    def is_mate_score(self) -> bool:
         return (
             UsiEvalSpecialValue.ValueMateInMaxPly <= self
             and self <= UsiEvalSpecialValue.ValueMate
         )
 
     # 詰まされるスコアであるか
-    def is_mated_score(self):
+    def is_mated_score(self) -> bool:
         return (
             UsiEvalSpecialValue.ValueMated <= self
             and self <= UsiEvalSpecialValue.ValueMatedInMaxPly
         )
 
     # 評価値を文字列化する。
-    def to_string(self):
+    def to_string(self) -> str:
         if self.is_mate_score():
             return "mate " + str(UsiEvalSpecialValue.ValueMate - self)
         elif self.is_mated_score():
@@ -54,13 +54,13 @@ class UsiEvalValue(int):
     # UsiEvalValueを返したいが、このクラスの定義のなかでは自分の型を明示的に返せないようで..(コンパイラのバグでは..)
     # ply : integer
     @staticmethod
-    def mate_in_ply(ply: int):  # -> UsiEvalValue
+    def mate_in_ply(ply: int) -> "UsiEvalValue":  # -> UsiEvalValue
         return UsiEvalValue(int(UsiEvalSpecialValue.ValueMate) - ply)
 
     # ply手で詰まされるスコアを数値化する
     # ply : integer
     @staticmethod
-    def mated_in_ply(ply: int):  # -> UsiEvalValue:
+    def mated_in_ply(ply: int) -> "UsiEvalValue":  # -> UsiEvalValue:
         return UsiEvalValue(-int(UsiEvalSpecialValue.ValueMate) + ply)
 
 
@@ -73,8 +73,8 @@ class UsiBound(Enum):
 
     # USIプロトコルで使う文字列化して返す。
     def to_string(self) -> str:
-        if self == self.BoundUpper:
+        if self == self.BoundUpper:  # type:ignore
             return "upperbound"
-        elif self == self.BoundLower:
+        elif self == self.BoundLower:  # type:ignore
             return "lowerbound"
         return ""

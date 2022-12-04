@@ -90,9 +90,6 @@ class SekisyuEngine(BaseVirtualEngine):
 
         # TODO electronのargの頭が悪いのでなんとかする
         self.qsa_full_path = os.path.join(os.getcwd(), self.config.qsa_path)
-        with open(os.path.dirname(self.qsa_full_path) + "/cmd.txt", "w") as f:
-            # text を空にする
-            pass
         if self.__proc_qsa is None:
             self.__proc_qsa = subprocess.Popen(
                 f"{self.qsa_full_path}",
@@ -211,7 +208,7 @@ class SekisyuEngine(BaseVirtualEngine):
         opt_list.append(
             f"option name NullEnemyRank type spin default {self.config.null_enemy_rank}"
         )
-        opt_list.append(f"option name AnalyzeEnemy type check default true")
+        opt_list.append("option name AnalyzeEnemy type check default true")
         opt_list.append(
             f"option name AnalyzeMultiPV type spin default {self.config.analyzer_multipv}"
         )
@@ -280,7 +277,6 @@ class SekisyuEngine(BaseVirtualEngine):
             or think_result.infos[0].pv[0] == "win"
         ):
             return think_result
-        alert_blunder = False
         value_send = None
         pos_packet = self.position.split(" ")
 
@@ -498,9 +494,7 @@ class SekisyuEngine(BaseVirtualEngine):
                 else:
                     self.send_qsa_cmd("quit\n")
             else:
-                with open(os.path.dirname(self.qsa_full_path) + "/cmd.txt", "w") as f:
-                    # text を空にする
-                    pass
+                pass
 
         self.engine.quit()
         if not self.engine_eq:

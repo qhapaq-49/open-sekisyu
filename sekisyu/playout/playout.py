@@ -11,7 +11,7 @@ from sekisyu.board.mycsa import Parser
 from sekisyu.kif_analyzer.config_kif_analyzer import ConfigAnalysis
 from sekisyu.kif_labeler.game_info_getter import get_title_alias_year_csa
 from sekisyu.playout.playinfo import BasePlayInfo, BasePlayInfoPack
-from shogi import CSA, KIF
+from shogi import KIF
 
 
 # ゲームの終局状態を示す

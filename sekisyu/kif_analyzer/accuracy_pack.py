@@ -1,6 +1,6 @@
 import dataclasses
 from dataclasses import field
-from typing import List
+from typing import List, Optional
 
 from sekisyu.kif_analyzer.config_kif_analyzer import ConfigAnalysis
 
@@ -13,7 +13,7 @@ class ConfigAccuracyPack:
     """
 
     # 解析に使ったconfig
-    config_analysis: ConfigAnalysis = None
+    config_analysis: Optional[ConfigAnalysis] = None
 
     # 手数毎に一致率を取得するときの手の刻み幅と最大値
     ply_range: int = 20
@@ -70,7 +70,7 @@ class AccuracyPack:
     # 棋譜の数
     kif_count: int = 0
 
-    def load_config(self, config: ConfigAccuracyPack):
+    def load_config(self, config: ConfigAccuracyPack) -> None:
         self.config = config
         self.rank_count = [
             [0 for _ in range(config.ply_max // config.ply_range + 1)]
@@ -99,7 +99,7 @@ class AccuracyPack:
             for _ in range(config.multipv + 1)
         ]
 
-    def calc_prod(self):
+    def calc_prod(self) -> None:
         """
         確率計算をする。rank_count, rank_count_evalからrank_count_prod, rank_count_prod_evalを計算する
         """

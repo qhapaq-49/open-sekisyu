@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from sekisyu.engine.base_engine import BaseEngine, UsiEngineState
 from sekisyu.playout.playinfo import BasePlayInfoPack
@@ -56,7 +56,7 @@ class BaseVirtualEngine(BaseEngine):
         """
         self.engine.set_print_info(print_info)
 
-    def get_state(self):
+    def get_state(self) -> Optional[UsiEngineState]:
         """
         現在のエンジンの状況を出力する
         """
@@ -73,7 +73,7 @@ class BaseVirtualEngine(BaseEngine):
 
     # エンジンのconnect()が呼び出されたあとであるか
     def is_connected(self) -> bool:
-        return self.engine.is_connected
+        return self.engine.is_connected()
 
     def quit(self) -> None:
         """
@@ -106,12 +106,14 @@ class BaseVirtualEngine(BaseEngine):
         """
         return self.engine.get_current_think_result()
 
-    def parse_pv(self, think_result: BasePlayInfoPack) -> BasePlayInfoPack:
+    def parse_pv(
+        self, think_result: BasePlayInfoPack, is_ponder: bool = False
+    ) -> BasePlayInfoPack:
         """
         pvの後処理を行う。主にvirtual engineでmultipvの結果を処理して云々みたいな使い方をする
         デフォルトでは何もしない
         """
-        return self.engine.parse_pv(think_result)
+        return self.engine.parse_pv(think_result, is_ponder=is_ponder)
 
     def send_go_and_wait(self, go_cmd: str) -> BasePlayInfoPack:
         """
@@ -144,23 +146,23 @@ class BaseVirtualEngine(BaseEngine):
         self.engine.send_command(cmd)
 
     # self.engine_stateを変更する。
-    def change_state(self, state: UsiEngineState):
+    def change_state(self, state: UsiEngineState) -> None:
         raise NotImplementedError
 
     # エンジンとのやりとりを行うスレッド(read方向)
-    def read_worker(self):
+    def read_worker(self) -> None:
         raise NotImplementedError
 
     # エンジンとやりとりを行うスレッド(write方向)
-    def write_worker(self):
+    def write_worker(self) -> None:
         raise NotImplementedError
 
     # エンジン側から送られてきたメッセージを解釈する。
-    def dispatch_message(self, message: str):
+    def dispatch_message(self, message: str) -> None:
         raise NotImplementedError
 
     # エンジンから送られてきた"bestmove"を処理する。
-    def handle_bestmove(self, message: str):
+    def handle_bestmove(self, message: str) -> None:
         raise NotImplementedError
 
     # エンジンから送られてきた"info ..."を処理する。
@@ -168,8 +170,8 @@ class BaseVirtualEngine(BaseEngine):
         raise NotImplementedError
 
     # デストラクタで通信の切断を行う。
-    def __del__(self):
+    def __del__(self) -> None:
         self.quit()
 
-    def wait_for_state(self, state: UsiEngineState):
+    def wait_for_state(self, state: UsiEngineState) -> None:
         self.engine.wait_for_state(state)

@@ -4,9 +4,7 @@ import threading
 from queue import Queue
 
 import yaml
-from dacite import Config, from_dict
 from sekisyu.engine.base_engine import BaseEngine, UsiEngineState
-from sekisyu.engine.config_engine import ConfigEngine
 from sekisyu.engine.engine_generator import generate_engine_dict
 
 # TODO : どういうわけかログの出力が尋常じゃなく遅い

@@ -1,4 +1,7 @@
+from typing import Optional
+
 import shogi.CSA
+from shogi import Board
 
 COLORS = [BLACK, WHITE] = range(2)
 SQUARES = [
@@ -144,7 +147,9 @@ PIECE_TYPE = [
     PROM_SILVER,
     PROM_BISHOP,
     PROM_ROOK,
-] = range(15)
+] = [  # type:ignore
+    i for i in range(15)
+]
 
 PIECE_STR_CSA = [
     "",
@@ -165,38 +170,38 @@ PIECE_STR_CSA = [
 ]
 
 
-def have_piece(board, color, piece):
+def have_piece(board: Board, color: int, piece: int) -> bool:
     return PIECE_TYPE[piece] in board.pieces_in_hand[color]
 
 
-def is_piece(board, color, piece, sq):
+def is_piece(board: Board, color: int, piece: int, sq: int) -> bool:
     return (
         conv_piece_to_str(board.piece_at(get_square(color, sq)))
         == PIECE_CHARA[color][PIECE_TYPE[piece]]
     )
 
 
-def get_square(color, sq):
+def get_square(color: int, sq: int) -> int:
     if color == 0:
         return SQUARES[sq]
     else:
         return 80 - SQUARES[sq]
 
 
-def conv_piece_to_str(piece):
+def conv_piece_to_str(piece: Optional[int]) -> str:
     if piece is None:
         return "."
     else:
-        return piece.symbol()
+        return piece.symbol()  # type:ignore
 
 
-def promote_piece(piece_id):
-    if piece_id <= GOLD:
+def promote_piece(piece_id: int) -> int:
+    if piece_id <= GOLD:  # type:ignore
         return piece_id + 8
     return piece_id + 7
 
 
-def get_csa_move(board, move_usi, is_black=True) -> str:
+def get_csa_move(board: Board, move_usi: str, is_black: bool = True) -> str:
     out = ""
     try:
         move = shogi.Move.from_usi(move_usi)

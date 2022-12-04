@@ -1,6 +1,7 @@
 import time
+from typing import Optional
 
-from sekisyu.engine.base_engine import BaseEngine, Turn, UsiEngineState
+from sekisyu.engine.base_engine import BaseEngine, UsiEngineState
 
 
 class DlshogiEngine(BaseEngine):
@@ -17,16 +18,16 @@ class DlshogiEngine(BaseEngine):
 
     def __init__(self, engine_name: str = "") -> None:
         super().__init__(engine_name)
-        self.ponder_str = None
+        self.ponder_str: Optional[str] = None
         # TODO : このへんもうちょっとマトモな実装があると思う
-        self.print_info_before = None
+        self.print_info_before: Optional[bool] = None
 
     def reflesh_game(self) -> None:
         self.send_command("isready")  # 先行して"isready"を送信
         self.change_state(UsiEngineState.WaitReadyOk)
 
     # エンジンとやりとりを行うスレッド(write方向)
-    def write_worker(self):
+    def write_worker(self) -> None:
 
         for option in self.options:
             self.send_command(
@@ -84,18 +85,20 @@ class DlshogiEngine(BaseEngine):
                 elif token == "ponderhit":
                     # ponderhitも破棄する
                     if self.ponder_str is not None:
-                        print(f"info string ponderhit go_cmd {self.ponder_str}")
+                        print(  # type:ignore
+                            f"info string ponderhit go_cmd {self.ponder_str}"
+                        )
                         self.send_command(self.ponder_str)
                         continue
-                self.proc.stdin.write(message + "\n")
-                self.proc.stdin.flush()
+                self.proc.stdin.write(message + "\n")  # type:ignore
+                self.proc.stdin.flush()  # type:ignore
 
                 if token == "quit":
                     self.change_state(UsiEngineState.Disconnected)
                     # 終了コマンドを送信したなら自発的にこのスレッドを終了させる。
                     break
 
-                retcode = self.proc.poll()
+                retcode = self.proc.poll()  # type:ignore
                 if retcode is not None:
                     break
 
@@ -103,7 +106,7 @@ class DlshogiEngine(BaseEngine):
             raise ValueError
 
     # エンジン側から送られてきたメッセージを解釈する。
-    def dispatch_message(self, message: str):
+    def dispatch_message(self, message: str) -> None:
         # 最後に受信した文字列はここに積む約束になっている。
         self.last_received_line = message
 

@@ -21,7 +21,7 @@ class ConfigQuestionRender:
 
 def question_render(
     question: NextPlyQuestion, config: ConfigQuestionRender, qname: str
-):
+) -> None:
     board = get_board_from_pos_cmd(question.question_pos)
     img = board_to_png(board, config.config_board)
     # font = ImageFont.truetype(font_path, font_size)

@@ -22,4 +22,4 @@ def draw_check_from_go_cmd(pos_cmd: str) -> bool:
     except Exception:
         print("bad move found", pos_cmd)
         return False
-    return result
+    return result  # type:ignore

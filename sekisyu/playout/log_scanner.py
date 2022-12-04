@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 
 # 文字列のparseを行うもの。
@@ -6,19 +6,19 @@ class Scanner:
 
     # argsとしてstr[]を渡しておく。
     # args[index]のところからスキャンしていく。
-    def __init__(self, args: [], index: int = 0):
+    def __init__(self, args: List[str], index: int = 0) -> None:
         self.__args = args
         self.__index = index
 
     # 次のtokenを覗き見する。tokenがなければNoneが返る。
     # indexは進めない
-    def peek_token(self) -> str:
+    def peek_token(self) -> Optional[str]:
         if self.is_eof():
             return None
         return self.__args[self.__index]
 
     # 次のtokenを取得して文字列として返す。indexを1進める。
-    def get_token(self) -> str:
+    def get_token(self) -> Optional[str]:
         if self.is_eof():
             return None
         token = self.__args[self.__index]
@@ -26,7 +26,7 @@ class Scanner:
         return token
 
     # 次のtokenを取得して数値化して返す。indexを1進める。
-    def get_integer(self) -> int:
+    def get_integer(self) -> Optional[int]:
         if self.is_eof():
             return None
         token = self.__args[self.__index]

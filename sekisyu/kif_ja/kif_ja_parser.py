@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import shogi
 from sekisyu.board.get_board_from_pos_cmd import get_board_from_pos_cmd
@@ -22,7 +22,9 @@ PIECE_STR_JA = [
 ]
 
 
-def get_ja_move(board: shogi.Board, move_usi, prev_move_usi: str = None):
+def get_ja_move(
+    board: shogi.Board, move_usi: str, prev_move_usi: Optional[str] = None
+) -> Optional[str]:
     out = ""
     is_drop = False
     try:
@@ -60,7 +62,9 @@ def get_ja_move(board: shogi.Board, move_usi, prev_move_usi: str = None):
     return out
 
 
-def translate_pv(current_pos: str, moves: List[str], prev_move: str = None) -> str:
+def translate_pv(
+    current_pos: str, moves: List[str], prev_move: Optional[str] = None
+) -> str:
     """
     盤面とpvから日本語の棋譜を取得する
 

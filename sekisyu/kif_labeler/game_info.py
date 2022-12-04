@@ -13,16 +13,16 @@ class GameInfo:
 
     def __init__(
         self,
-        game_title,
-        black_pl,
-        white_pl,
-        is_draw,
-        is_black_win,
-        alias,
-        year,
-        title,
+        game_title: str,
+        black_pl: str,
+        white_pl: str,
+        is_draw: bool,
+        is_black_win: bool,
+        alias: str,
+        year: str,
+        title: str,
         is_remove_title: bool = True,
-    ):
+    ) -> None:
         self.game_title = game_title
         if is_remove_title:
             self.black_pl = remove_title(black_pl)

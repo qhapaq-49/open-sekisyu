@@ -1,6 +1,6 @@
 import dataclasses
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from PIL import Image, ImageDraw, ImageOps
 from shogi import SQUARES, Board, Consts
@@ -226,8 +226,8 @@ def calc_hand_point_white(config: ConfigBoard) -> Tuple[int, int]:
 
 
 def board_to_png(
-    board, config: ConfigBoard, move=None, save_png_name: str = None
-) -> None:
+    board: Board, config: ConfigBoard, save_png_name: Optional[str] = None
+) -> Image:
     """
     盤面をpngに変換する
     """
@@ -287,7 +287,7 @@ def board_to_png(
     return im
 
 
-def kif_to_png(kif_file, output_dir):
+def kif_to_png(kif_file: str, output_dir: str) -> None:
     import os
 
     import shogi

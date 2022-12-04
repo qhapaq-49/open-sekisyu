@@ -1,7 +1,7 @@
 import dataclasses
 import textwrap
 from pathlib import Path
-from typing import Tuple
+from typing import Optional, Tuple
 
 import PIL
 import shogi
@@ -177,11 +177,11 @@ def calc_hand_points(
 
 
 def board_to_png(
-    board,
+    board: Board,
     config: ConfigBoard,
-    move=None,
-    save_png_name: str = None,
-    comment: str = None,
+    move: Optional[str] = None,
+    save_png_name: Optional[str] = None,
+    comment: Optional[str] = None,
 ) -> Image:
     """
     盤面をpngに変換する
@@ -316,7 +316,7 @@ def board_to_png(
     return im
 
 
-def kif_to_png(kif_file, output_dir):
+def kif_to_png(kif_file: str, output_dir: str) -> None:
     import os
 
     import shogi

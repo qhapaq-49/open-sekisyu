@@ -1,4 +1,3 @@
-import copy
 import dataclasses
 from typing import List
 
@@ -40,8 +39,20 @@ class YaneDLEnsembler(BaseEnsembler):
             best = playinfos[1].infos[0]
             bm_change = True
         # debug
-        # if not bm_change:
-        #    print("yane_info", yane_bestmove, "dlinfo", playinfos[0].infos[0].pv[0], "ensemble", best.pv[0], "yane_nodes", yane_nodes, "bm_change", bm_change, "notinpv", not_in_pv)
+        print(
+            "info string yane_info",
+            yane_bestmove,
+            "dlinfo",
+            playinfos[0].infos[0].pv[0],
+            "ensemble",
+            best.pv[0],
+            "yane_nodes",
+            yane_nodes,
+            "bm_change",
+            bm_change,
+            "notinpv",
+            not_in_pv,
+        )
 
         output.infos = [best]
         output.infos.extend(playinfos[1].infos)

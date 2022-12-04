@@ -54,7 +54,6 @@ def run_kif(file_names: List[str], config, engine, output_root) -> None:
             raise ValueError
         save_dir = f"{output_root}/data_{os.path.basename(file_name)}"
         os.makedirs(save_dir, exist_ok=True)
-        pos_cmd = "position startpos moves "
         board = Board(data["sfen"])
         for i, move in enumerate(data["moves"]):
             ques = generate_question_from_pos(

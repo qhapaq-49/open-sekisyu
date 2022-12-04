@@ -4,7 +4,7 @@ import threading
 import time
 from enum import Enum, IntEnum
 from queue import Queue
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from sekisyu.playout.playinfo import (
     BasePlayInfo,
@@ -60,25 +60,25 @@ class BaseEngine:
         エンジンの初期化
         """
         self.engine_name = engine_name
-        self.engine_path = None
-        self.engine_state = None
-        self.options = []
+        self.engine_path: str = ""
+        self.engine_state: Optional[UsiEngineState] = None
+        self.options: List[Tuple[str, str]] = []
         # infoから始まる文字列を標準出力する(gui用のdirty hack)
         self.print_info = False
         self.think_result: BasePlayInfoPack = BasePlayInfoPack()
         # private
         # エンジンのプロセスハンドル
-        self.proc = None
+        self.proc: Optional[subprocess.Popen] = None
 
         # エンジンとやりとりするスレッド
-        self.read_thread = None
-        self.write_thread = None
+        self.read_thread: Optional[threading.Thread] = None
+        self.write_thread: Optional[threading.Thread] = None
 
         # 最後にエンジン側から受信した1行
-        self.last_received_line = None
+        self.last_received_line: Optional[str] = None
 
         # エンジンにコマンドを送信するためのqueue(送信スレッドとのやりとりに用いる)
-        self.send_queue = Queue()
+        self.send_queue: Queue = Queue()
 
         # print()を呼び出すときのlock object
         self.lock_object = threading.Lock()
@@ -101,7 +101,7 @@ class BaseEngine:
             str: エンジン名
         """
         if self.engine_name == "":
-            return self.engine_path
+            return self.engine_path if self.engine_path is not None else ""
         return self.engine_name
 
     def get_usi_option(self) -> List[str]:
@@ -113,7 +113,7 @@ class BaseEngine:
         """
         self.wait_for_state(UsiEngineState.WaitCommand)
         self.change_state(UsiEngineState.PrintUSI)
-        self.usi_options = []
+        self.usi_options: List[str] = []
         self.send_command("usi")
         self.wait_for_state(UsiEngineState.WaitCommand)
         return self.usi_options
@@ -129,7 +129,7 @@ class BaseEngine:
         # 別のエンジンを起動しているかもしれないので落とす
         self.quit()
         self.engine_state = None
-        self.exit_state = None
+        self.exit_state: Optional[str] = None
 
         self.engine_path = engine_path
 
@@ -213,10 +213,10 @@ class BaseEngine:
         # GCが呼び出されたときに回収されるはずだが、UnitTestでresource leakの警告が出るのが許せないので
         # この時点でclose()を呼び出しておく。
         if self.proc is not None:
-            self.proc.stdin.close()
-            self.proc.stdout.close()
-            self.proc.stderr.close()
-            self.proc.terminate()
+            self.proc.stdin.close()  # type:ignore
+            self.proc.stdout.close()  # type:ignore
+            self.proc.stderr.close()  # type:ignore
+            self.proc.terminate()  # type:ignore
 
         self.proc = None
         self.change_state(UsiEngineState.Disconnected)
@@ -265,7 +265,7 @@ class BaseEngine:
         """
         return think_result
 
-    def get_state(self):
+    def get_state(self) -> Optional[UsiEngineState]:
         """
         現在のエンジンの状況を出力する
         """
@@ -280,7 +280,7 @@ class BaseEngine:
             送られるgoコマンド。ex "go byoyomi 1000"
         """
         # 過去のgoの結果を消す
-        self.think_result: BasePlayInfoPack = BasePlayInfoPack()
+        self.think_result = BasePlayInfoPack()
         self.send_queue.put(go_cmd)
         self.wait_for_state(UsiEngineState.WaitBestmove)
         self.wait_for_state(UsiEngineState.WaitCommand)
@@ -293,7 +293,7 @@ class BaseEngine:
         self.send_queue.put(cmd)
 
     # self.engine_stateを変更する。
-    def change_state(self, state: UsiEngineState):
+    def change_state(self, state: UsiEngineState) -> None:
         # 切断されたあとでは変更できない
         if self.engine_state == UsiEngineState.Disconnected:
             return
@@ -312,18 +312,19 @@ class BaseEngine:
             self.state_changed_cv.notify_all()
 
     # エンジンとのやりとりを行うスレッド(read方向)
-    def read_worker(self):
+    def read_worker(self) -> None:
+        assert self.proc is not None
         while True:
-            line = self.proc.stdout.readline()
+            line = self.proc.stdout.readline()  # type:ignore
             # プロセスが終了した場合、line = Noneのままreadline()を抜ける。
             if line:
                 # print("engine message",line)
                 self.dispatch_message(line.strip())
 
             # プロセスが生きているかのチェック
-            retcode = self.proc.poll()
+            retcode = self.proc.poll()  # type:ignore
             if not line and retcode is not None:
-                self.exit_state = 0
+                self.exit_state = "0"
                 # エラー以外の何らかの理由による終了
                 break
 
@@ -343,7 +344,7 @@ class BaseEngine:
         self.wait_for_state(UsiEngineState.WaitCommand)
 
     # エンジンとやりとりを行うスレッド(write方向)
-    def write_worker(self):
+    def write_worker(self) -> None:
 
         for option in self.options:
             self.send_command(
@@ -351,6 +352,7 @@ class BaseEngine:
             )
         self.send_command("isready")  # 先行して"isready"を送信
         self.change_state(UsiEngineState.WaitReadyOk)
+        assert self.proc is not None
 
         try:
             while True:
@@ -382,8 +384,8 @@ class BaseEngine:
                     self.wait_for_state(UsiEngineState.WaitCommand)
                 elif token == "ponderhit":
                     pass
-                self.proc.stdin.write(message + "\n")
-                self.proc.stdin.flush()
+                self.proc.stdin.write(message + "\n")  # type:ignore
+                self.proc.stdin.flush()  # type:ignore
 
                 if token == "quit":
                     self.change_state(UsiEngineState.Disconnected)
@@ -399,7 +401,7 @@ class BaseEngine:
             raise ValueError
 
     # エンジン側から送られてきたメッセージを解釈する。
-    def dispatch_message(self, message: str):
+    def dispatch_message(self, message: str) -> None:
         # 最後に受信した文字列はここに積む約束になっている。
         self.last_received_line = message
 
@@ -439,7 +441,7 @@ class BaseEngine:
                 self.usi_options.append(message)
 
     # エンジンから送られてきた"bestmove"を処理する。
-    def handle_bestmove(self, message: str):
+    def handle_bestmove(self, message: str) -> None:
         messages = message.split()
         if len(messages) >= 4 and messages[2] == "ponder":
             self.think_result.ponder = messages[3]
@@ -453,20 +455,18 @@ class BaseEngine:
     # エンジンから送られてきた"info ..."を処理する。
     def handle_info(self, message: str) -> None:
         # まだ"go"を発行していないのか？
-        if self.think_result is None:
-            return
-        info: BasePlayInfo = generate_playinfo_from_info(message)
+        info: Optional[BasePlayInfo] = generate_playinfo_from_info(message)
         if info is None:
             return
-        while len(self.think_result.infos) < info.multipv:
-            self.think_result.infos.append(None)
+        if len(self.think_result.infos) < info.multipv:
+            self.think_result.infos.append(None) # type:ignore
         self.think_result.infos[info.multipv - 1] = info
 
     # デストラクタで通信の切断を行う。
-    def __del__(self):
+    def __del__(self) -> None:
         self.quit()
 
-    def wait_for_state(self, state: UsiEngineState):
+    def wait_for_state(self, state: UsiEngineState) -> None:
         while True:
             if self.dead:
                 break
@@ -485,8 +485,8 @@ class BaseEngine:
         self.wait_for_state(UsiEngineState.WaitCommand)
         self.last_received_line = None
         with self.state_changed_cv:
-            self.send_cmd(command)
+            self.send_command(command)
 
             # エンジン側から一行受信するまでblockingして待機
             self.state_changed_cv.wait_for(lambda: self.last_received_line is not None)
-            return self.last_received_line
+            return self.last_received_line  # type:ignore

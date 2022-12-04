@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List
+from typing import List, Tuple
 
 from sekisyu.kif_analyzer.accuracy_pack import AccuracyPack, ConfigAccuracyPack
 
@@ -14,10 +14,10 @@ class StrengthData:
     config_accuracy_pack: ConfigAccuracyPack
 
     # 手数の状態がiの状態での強さ
-    strength_ply: List[int]
+    strength_ply: List[float]
 
     # 評価値の状態がiの状態での強さ
-    strength_eval: List[int]
+    strength_eval: List[float]
 
 
 @dataclasses.dataclass
@@ -33,10 +33,10 @@ class StrengthEvalFunction:
     accuracy_pack_list: List[AccuracyPack]
 
     # i番目のプレイヤーの強さ（eloレーティングであることが多い）
-    strength_list: List[int]
+    strength_list: List[float]
 
 
-def dot(xs, ys):
+def dot(xs: List[float], ys: List[float]) -> float:
     """
     numpyのdotが使えないので泣く泣く実装
     """
@@ -46,14 +46,16 @@ def dot(xs, ys):
     return out
 
 
-def mul(xs, value):
+def mul(xs: List[float], value: List[float]) -> List[float]:
     """
     numpyの*演算子が使えないので泣く泣く実装
     """
     return [x * v for (x, v) in zip(xs, value)]
 
 
-def get_linear_param(x, y, weight):
+def get_linear_param(
+    x: List[float], y: List[float], weight: List[float]
+) -> Tuple[float, float]:
     """
     weightで重み付けされた最小二乗法で線形補間を行い、y=ax+bを得る
     """
@@ -66,7 +68,9 @@ def get_linear_param(x, y, weight):
     return a, b
 
 
-def get_wl_expectation(x_data, y_data, pred_x, scale):
+def get_wl_expectation(
+    x_data: List[float], y_data: List[float], pred_x: float, scale: float
+) -> float:
     """
     重み付きの線形補間で予測値を得る
     """
@@ -90,8 +94,8 @@ def expect_rate(eval_func: StrengthEvalFunction, acc: AccuracyPack) -> StrengthD
 
     # TODO config_accyracy_packが一致するかをチェック
 
-    strength_ply: List[int] = []
-    strength_eval: List[int] = []
+    strength_ply: List[float] = []
+    strength_eval: List[float] = []
 
     # 進行に関するレート計算
     for i in range(len(eval_func.accuracy_pack_list[0].rank_count_prod)):
@@ -111,7 +115,10 @@ def expect_rate(eval_func: StrengthEvalFunction, acc: AccuracyPack) -> StrengthD
             prod_list.append(ac_eval.rank_count_prod_eval[0][i])
         strength_eval.append(
             get_wl_expectation(
-                prod_list, eval_func.strength_list, acc.rank_count_prod_eval[0][i], 0.15
+                prod_list,
+                eval_func.strength_list,
+                acc.rank_count_prod_eval[0][i],
+                0.15,
             )
         )
 

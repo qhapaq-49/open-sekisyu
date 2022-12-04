@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Optional
 
 remove_list = [
     "九段",
@@ -68,7 +68,7 @@ remove_list = [
 ]
 
 
-def remove_title(original_name) -> str:
+def remove_title(original_name: str) -> str:
     """
     xx 初段などの肩書を除去した文字列を返す
 
@@ -88,7 +88,7 @@ def search_filter(
     filter_names: List[str],
     upgrade: bool = False,
     remove_title_upgrade: bool = True,
-) -> int:
+) -> Optional[int]:
     """
     対局者の名前がフィルタのどれかに合致するかを検索する。
     複数のフィルタに合致する場合、idxが一番若いものが返される

@@ -1,8 +1,5 @@
-import copy
-import dataclasses
 from typing import List, Optional, Tuple
 
-from dacite import from_dict
 from sekisyu.ensemble.base_ensembler import BaseEnsembler
 from sekisyu.playout.playinfo import BasePlayInfoPack
 
@@ -15,8 +12,8 @@ class PositiveEnsembler(BaseEnsembler):
     def __init__(
         self,
         bonus: Optional[List[int]] = None,
-        bonus_by_ply: Optional[int] = None,
-        bonus_by_eval: List[Tuple[int, int]] = None,
+        bonus_by_ply: Optional[List[int]] = None,
+        bonus_by_eval: Optional[List[Tuple[int, int]]] = None,
         book_th: Optional[int] = None,
     ) -> None:
         self.bonus = bonus
@@ -36,7 +33,7 @@ class PositiveEnsembler(BaseEnsembler):
             # 何らかの事情でクラッシュしてる
             if len(infos.infos) == 0:
                 continue
-            v = infos.infos[0].eval
+            v = int(infos.infos[0].eval)
             if i == 0 and infos.infos[0].eval > 30000 or infos.infos[0].eval < -30000:
                 v += 99999
             # 定跡の処理。nodeの数でhookするというhackyな仕様

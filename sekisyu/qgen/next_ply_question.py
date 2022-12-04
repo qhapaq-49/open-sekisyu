@@ -52,7 +52,7 @@ class NextPlyQuestion:
     null_value_list: Optional[List[int]] = None
 
     # 自分の指し手に対して相手がパスした場合の評価
-    null_enemy_move_info: List[Optional[BasePlayInfoPack]] = None
+    null_enemy_move_info: Optional[List[BasePlayInfoPack]] = None
     null_enemy_ans_list: Optional[List[str]] = None
     null_enemy_sfen_list: Optional[List[List[str]]] = None
     null_enemy_value_list: Optional[List[int]] = None

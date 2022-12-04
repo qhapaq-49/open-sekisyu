@@ -77,7 +77,7 @@ class BoardSimularityCalculator:
             )
             self.game_to_use_black = random.choice(glob.glob(self.black_file_glob))
         else:
-            print(f"info string kif file not found. possibly wrong path")
+            print("info string kif file not found. possibly wrong path")
             self.game_to_use_black = None
         if len(glob.glob(self.white_file_glob)) != 0:
             print(
@@ -85,7 +85,7 @@ class BoardSimularityCalculator:
             )
             self.game_to_use_white = random.choice(glob.glob(self.white_file_glob))
         else:
-            print(f"info string kif file not found. possibly wrong path")
+            print("info string kif file not found. possibly wrong path")
             self.game_to_use_white = None
 
     def update_board_old(

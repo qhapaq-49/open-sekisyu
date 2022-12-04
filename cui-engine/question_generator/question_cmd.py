@@ -1,7 +1,5 @@
 import argparse
 import dataclasses
-import io
-import sys
 
 from sekisyu.engine.config_engine import ConfigEngine
 from sekisyu.engine.engine_generator import generate_engine
