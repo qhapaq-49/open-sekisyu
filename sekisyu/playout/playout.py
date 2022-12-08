@@ -296,3 +296,47 @@ class BasePlayOut:
                 "result": result,
             }
         )
+
+    def expect_book_length_by_zero_eval(self) -> Tuple[int, int]:
+        """
+        定跡の長さを予想するためのヘルパ関数。関数名の通り評価値がゼロの手を定跡とみなす。
+        定跡が最初に外れた手数を定跡の長さとみなす。再合流はカウントしないことに注意。
+        先手・後手のそれぞれ定跡があたった手数を返す。
+        """
+        sente_value = 0
+        gote_value = 0
+        sente_done = False
+        gote_done = False
+
+        for i, playinfo in enumerate(self.playinfo_list):
+            if playinfo.infos.eval[0] == 0:
+                book_ok = True
+            else:
+                book_ok = False
+            if book_ok:
+                if i % 2 == 0 and not sente_done:
+                    sente_value += 1
+                if i % 2 == 1 and not gote_done:
+                    gote_value += 1
+            else:
+                if i % 2 == 0:
+                    sente_done = True
+                else:
+                    gote_done = True
+                if sente_done and gote_done:
+                    break
+        return sente_value, gote_value
+
+    def get_eval_from_playinfo(
+        self, ply: int, force_not_none: bool = False
+    ) -> Optional[int]:
+        """
+        当該手数での評価値を返す。人間同士の対局など、そもそも評価値がないケースについてはNoneを返す。
+        将棋の手数は1-idxだがこの関数は0-idxであることに注意
+        """
+        if len(self.playinfo_list) <= ply:
+            if not force_not_none:
+                return None
+            else:
+                return 0
+        return self.playinfo_list[ply].infos[0].eval

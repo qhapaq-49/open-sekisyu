@@ -6,7 +6,7 @@ from sekisyu.csa.csa import playout_to_csa_v22
 from sekisyu.engine.engine_generator import generate_engine_dict
 
 
-def kif_make(conf: ConfigAutoBattle, reboot_engine: bool = False) -> AutoBattleResult:
+def kif_make(conf: ConfigAutoBattle, reboot_engine: bool = True) -> AutoBattleResult:
     print(conf)
     engine1 = generate_engine_dict(conf.config_1p)
     engine2 = generate_engine_dict(conf.config_2p)
@@ -80,6 +80,8 @@ def kif_make(conf: ConfigAutoBattle, reboot_engine: bool = False) -> AutoBattleR
             server.terminate()
             engine1 = generate_engine_dict(conf.config_1p)
             engine2 = generate_engine_dict(conf.config_2p)
+            engine1.set_print_info(False)
+            engine2.set_print_info(False)
             server: BattleServer = BattleServer(engine1, engine2, conf.config)
 
     server.terminate()

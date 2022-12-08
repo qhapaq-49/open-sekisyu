@@ -48,7 +48,7 @@ class BattleServer:
                 for file_name in self.config.initial_pos_list:
                     with open(file_name) as f:
                         initial_pos_list.extend(f.readlines())
-
+                self.config.initial_pos_list = initial_pos_list
         # 現在の手番側
         self.side_to_move = Turn.BLACK
 

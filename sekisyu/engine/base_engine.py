@@ -459,7 +459,7 @@ class BaseEngine:
         if info is None:
             return
         if len(self.think_result.infos) < info.multipv:
-            self.think_result.infos.append(None) # type:ignore
+            self.think_result.infos.append(None)  # type:ignore
         self.think_result.infos[info.multipv - 1] = info
 
     # デストラクタで通信の切断を行う。
