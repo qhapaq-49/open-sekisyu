@@ -1,0 +1,16 @@
+engine_name : "js26_win_test"
+engine_mode : "relay"
+ply_to_pass : [10]
+
+base_engine_configs:
+  -
+    engine_mode : "yaneuraou"
+    engine_path : "/home/shiku/AI/shogi/bin/YaneuraOu-7"
+    engine_name : "yaneuraou_7_qpd"
+    option : [["Threads", "2"], ["BookFile", "no_book.db"], ["MultiPV", "1"], ["EvalDir", "/home/shiku/AI/shogi/bin/suisho5_eval"]]
+  -
+    engine_mode : "yaneuraou"
+    engine_path : "/home/shiku/AI/shogi/bin/YaneuraOu-7"
+    engine_name : "yaneuraou_7_qpd"
+    option : [["Threads", "2"], ["BookFile", "no_book.db"], ["MultiPV", "1"], ["EvalDir", "/home/shiku/AI/shogi/bin/suisho5_eval"]]
+

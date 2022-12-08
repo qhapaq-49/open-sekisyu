@@ -4,6 +4,7 @@ from sekisyu.engine.base_engine import BaseEngine, UsiEngineState
 from sekisyu.engine.dlshogi_engine import DlshogiEngine
 from sekisyu.engine.virtual_engine.ensemble_engine import EnsembleEngine
 from sekisyu.engine.virtual_engine.forcebook_engine import ForceBookEngine
+from sekisyu.engine.virtual_engine.relay_engine import RelayEngine
 from sekisyu.engine.virtual_engine.sekisyu_engine import SekisyuEngine
 from sekisyu.engine.yaneuraou_engine import YaneuraOuEngine
 from sekisyu.ensemble.ensemble_generator import generate_ensembler_dict
@@ -52,6 +53,12 @@ def generate_engine_dict(config: Dict[str, Any]) -> BaseEngine:
             engines.append(generate_engine_dict(base))
         ensembler = generate_ensembler_dict(config["ensembler_config"])
         engine = EnsembleEngine(engines, ensembler, config["engine_name"])
+
+    elif config["engine_mode"] == "relay":
+        engines = []
+        for base in config["base_engine_configs"]:
+            engines.append(generate_engine_dict(base))
+        engine = RelayEngine(engines, config["ply_to_pass"], config["engine_name"])
 
     else:
         engine = BaseEngine(config["engine_name"])
